@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "238160962611",
+    "firebase_url": "https://banappsremover.firebaseio.com",
+    "project_id": "banappsremover",
+    "storage_bucket": "banappsremover.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:238160962611:android:62aa3cef5372ca1251af46",
+        "android_client_info": {
+          "package_name": "com.BanAppsRemover"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "238160962611-ire12dgh3egevjqrfk7bit5llhihi9ar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7jdYBO_W0KLeEgjvYvgdpxvKAYJ-5uUs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "238160962611-ire12dgh3egevjqrfk7bit5llhihi9ar.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
