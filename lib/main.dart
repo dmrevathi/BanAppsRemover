@@ -5,8 +5,14 @@ import 'package:intent/action.dart' as android_action;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:share/share.dart';
+import 'package:loading_overlay/loading_overlay.dart';
+import 'package:social_share/social_share.dart';
+import 'package:launch_review/launch_review.dart'; 
 
 QuerySnapshot qn;
+
+//AsyncMemoizer _memoizer = AsyncMemoizer();
 
 void main() => runApp(MaterialApp(home: ListAppsPages(false)));
 
@@ -59,15 +65,10 @@ class _ListAppsPagesState extends State<ListAppsPages> {
   }
 
   Future getPosts() async {
-    print('p2');
+    print('p2 get posts');
     var firestore = Firestore.instance;
     qn = await firestore.collection("apps").getDocuments();
-    print('get posts');
     setState(() => getAppsDone = true);
-    print(qn.documents.toString());
-    qn.documents.forEach((f) {
-      print(f.data["app_id"]);
-    });
     //return qn.documents;
   }
 
@@ -75,38 +76,34 @@ class _ListAppsPagesState extends State<ListAppsPages> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Installed applications'),
+        title: Text('Banned Apps Remover'),
+        backgroundColor: Colors.green,
         actions: <Widget>[
           PopupMenuButton<String>(
             itemBuilder: (BuildContext context) {
               return <PopupMenuItem<String>>[
                 PopupMenuItem<String>(
-                    value: 'system_apps', child: Text('Toggle system apps')),
-                PopupMenuItem<String>(
-                  value: 'launchable_apps',
-                  child: Text('Toggle launchable apps only'),
+                  value: 'share',
+                  child: Text('Share'),
                 ),
                 PopupMenuItem<String>(
-                  value: 'refresh',
-                  child: Text('Refresh'),
+                  value: 'shareOnWhatsApp',
+                  child: Text('Share On WhatsApp'),
                 ),
               ];
             },
-            onSelected: (String key) {
-              if (key == 'system_apps') {
-                setState(() {
-                  _showSystemApps = !_showSystemApps;
-                });
-              }
-              if (key == 'launchable_apps') {
-                setState(() {
-                  _onlyLaunchableApps = !_onlyLaunchableApps;
-                });
-              }
-              if (key == 'refresh') {
-                setState(() {
-                  _onlyLaunchableApps = !_onlyLaunchableApps;
-                });
+            onSelected: (String key) async {
+              if (key == 'share') {
+                final RenderBox box = context.findRenderObject();
+                Share.share("Share https://play.google.com/store/apps/details?id=com.snapchat.android",
+          subject: "Sharing Is Caring",
+          sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
+              } else if(key == 'shareOnWhatsApp'){
+                  SocialShare.shareWhatsapp(
+                            "I'm strongly recommending banned apps remover.  \n https://play.google.com/store/apps/details?id=com.snapchat.android")
+                        .then((data) {
+                      print(data);
+                    });
               }
             },
           )
@@ -123,12 +120,31 @@ class _ListAppsPagesState extends State<ListAppsPages> {
                 SizedBox(height: 10.0),
                 Container(
                     padding: EdgeInsets.only(left: 25.0, right: 25.0),
-                    child: Text('Please close the VPN apps and scan',
-                        style: TextStyle(fontSize: 24.0, color: Colors.blue))),
+                    child: Text('Thanks for installing me!!!',
+                        style: TextStyle(fontSize: 24.0, color: Colors.green))),
                 SizedBox(height: 10.0),
-                new RaisedButton(
+                Container(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0),
+                    child: Row(
+                 mainAxisAlignment: MainAxisAlignment.center,
+                 children: <Widget>[
+                   Icon(Icons.favorite,
+      color: Colors.pink,
+      size: 40.0)
+                ])),
+                SizedBox(height: 10.00),
+                Container(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0),
+                    child: Text('Please make sure that VPN is stopped in your device and press scan button.',
+                        style: TextStyle(fontSize: 24.0, color: Colors.green))),
+                SizedBox(height: 10.0),
+                Container(
+                  padding: EdgeInsets.only(left: 25.0, right: 25.0),
+                    child: Row(
+                 mainAxisAlignment: MainAxisAlignment.end,
+                 children: <Widget>[ new RaisedButton(
                     padding: EdgeInsets.all(10),
-                    color: Colors.blue,
+                    color: Colors.green,
                     child: new Text(
                       "Scan",
                       style: new TextStyle(fontSize: 20.0, color: Colors.white),
@@ -137,7 +153,7 @@ class _ListAppsPagesState extends State<ListAppsPages> {
                       Center(child: CircularProgressIndicator());
                       //setState(() => getAppsDone = true);
                       getPosts();
-                    }),
+                    })])),
               ],
             ),
     );
@@ -191,38 +207,73 @@ class _ListAppsPagesContent extends StatelessWidget {
                 Container(
                     padding: EdgeInsets.only(left: 25.0, right: 25.0),
                     child: Text('Super!!!',
-                        style: TextStyle(fontSize: 24.0, color: Colors.blue)
+                        style: TextStyle(fontSize: 24.0, color: Colors.green)
                         )
                         ),
                 SizedBox(height: 10.0),
                 Container(
                     padding: EdgeInsets.only(left: 25.0, right: 25.0),
-                    child: Text('You don\'t have any baneed apps',
-                        style: TextStyle(fontSize: 24.0, color: Colors.blue)
+                    child: Text('You have removed all the banned Apps.',
+                        style: TextStyle(fontSize: 24.0, color: Colors.green)
+                        )
+                        ),
+                        SizedBox(height: 10.0),
+                Container(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0),
+                    child: Text('I have worked day and night to create this app. Please share to support.',
+                        style: TextStyle(fontSize: 24.0, color: Colors.green)
                         )
                         ),
                         SizedBox(height: 10.0),
                 Container(
                     padding: EdgeInsets.only(left: 25.0, right: 25.0),
                     child: RaisedButton(
-                color: Colors.pink[400],
+                color: Colors.green,
                 child: Text(
-                  'uninstall me',
+                  'Share on WhatsApp',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  SocialShare.shareWhatsapp(
+                            "I'm strongly recommending banned apps remover.  \n https://play.google.com/store/apps/details?id=com.snapchat.android")
+                        .then((data) {
+                      print(data);
+                    });
+                }
+                        )
+                ),
+                SizedBox(height: 10.0),
+                Container(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0),
+                    child: RaisedButton(
+                color: Colors.green,
+                child: Text(
+                  'Rate us on play store',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  LaunchReview.launch(androidAppId: "com.banappsremover");
+                }
+                        )
+                ),
+                SizedBox(height: 10.0),
+                Container(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0),
+                    child: RaisedButton(
+                color: Colors.green,
+                child: Text(
+                  'Share',
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
 
-                  android_intent.Intent()
-                    ..setAction(android_action.Action.ACTION_DELETE)
-                    ..setData(Uri.parse("package:com.banappsremover"))
-                    ..startActivity();
                 }
                         )
                 )
               ]));
             } else {
               /*else start */
-                return Scrollbar(
+              return Scrollbar(
                 child: ListView.builder(
                     itemBuilder: (BuildContext context, int position) {
                       Application app = apps[position];
@@ -254,7 +305,31 @@ class _ListAppsPagesContent extends StatelessWidget {
                                                 app.packageName, app.appName)))
                                   },
                                   title: Text(
-                                    '${app.appName}')
+                                    '${app.appName}'),
+                                    subtitle: Column(
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                        child: Row(
+                      children: <Widget>[
+                        RaisedButton(
+                          onPressed: () {
+                            Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => _AppDetail(
+                                                app.packageName, app.appName)));
+                          },
+                color: Colors.green,
+                padding: EdgeInsets.all(6),
+                child: Text(
+                  'Check in playstore',
+                  style: TextStyle(color: Colors.white),
+                )
+                )]
+                        )
+                    )]
+                                    )
                                   //     '${app.appName} (${app.packageName})'),
                                   // subtitle: Text('Version: ${app.versionName}\n'
                                   //     'System app: ${app.systemApp}\n'
@@ -301,6 +376,8 @@ class __AppDetailState extends State<_AppDetail> {
   final _key = UniqueKey();
   String _statusText = "Signing you in...";
   WebViewController _controller;
+  bool isLoading = true;
+  String isAppInPlayStore = "loading";
 
   __AppDetailState(packageName, appName) {
     this._url = 'https://play.google.com/store/apps/details?id=' + packageName;
@@ -315,13 +392,13 @@ class __AppDetailState extends State<_AppDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(),
-        body: SingleChildScrollView(
+        body: LoadingOverlay(child: SingleChildScrollView(
             child: Column(children: <Widget>[
           SizedBox(height: 10.0),
           Container(
               padding: EdgeInsets.only(left: 25.0, right: 25.0),
               child: Text('Checking the app in Play Store',
-                  style: TextStyle(fontSize: 24.0, color: Colors.blue))),
+                  style: TextStyle(fontSize: 24.0, color: Colors.green))),
           SizedBox(height: 10.0),
           Container(
               padding: EdgeInsets.only(left: 25.0, right: 25.0),
@@ -337,7 +414,7 @@ class __AppDetailState extends State<_AppDetail> {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(0)),
                 color: Colors.black,
-                border: Border.all(color: Colors.blueAccent)),
+                border: Border.all(color: Colors.green)),
             child: ClipRRect(
                 borderRadius: BorderRadius.all(Radius.circular(0)),
                 child: WebView(
@@ -359,13 +436,16 @@ class __AppDetailState extends State<_AppDetail> {
                     print('Page finished loading: $url');
                     // In the final result page we check the url to make sure  it is the last page.
                     //if (url.contains('/finalresponse.html')) {
+                      setState(() => isLoading = false);
                     _controller.evaluateJavascript(
                         "(function(){Flutter.postMessage(window.document.body.outerHTML)})();");
                     //}
                   },
                 )),
           )
-        ])),
+        ])
+        ), isLoading: isLoading,
+        ),
         floatingActionButton: Stack(children: <Widget>[
           Align(
               child: FloatingActionButton.extended(
@@ -391,12 +471,79 @@ class __AppDetailState extends State<_AppDetail> {
                 heroTag: null,
                 backgroundColor: const Color(0xff03dac6),
                 foregroundColor: Colors.black,
-                onPressed: () {
-                  android_intent.Intent()
+                onPressed: () => {
+
+                    if(isAppInPlayStore=="loading"){
+
+                      showDialog(
+                                      context: context,
+                                      child: new AlertDialog(
+                                        title: new Text(
+                                            "Please wait. It is loading."),
+                                      ))
+
+                    } else if(isAppInPlayStore=="available"){
+                  showDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title:
+                                                  Center(child: Text('Alert')),
+                                              content: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: <Widget>[
+                                                  Container(
+                                                    child: Text(
+                                                      "App is available in play store. Means, it is not banned. Still, do you want to uninstall?",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: <Widget>[
+                                                        FlatButton(
+                                                            child: Text('Yes'),
+                                                            onPressed: () {
+                                                              android_intent.Intent()
                     ..setAction(android_action.Action.ACTION_DELETE)
                     ..setData(Uri.parse("package:${packageName}"))
                     ..startActivity();
-                },
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            }),
+                                                        FlatButton(
+                                                            child: Text('No'),
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            })
+                                                      ])
+                                                ],
+                                              ),
+                                            );
+                                            }
+                )
+                    } else {
+
+                      android_intent.Intent()
+                    ..setAction(android_action.Action.ACTION_DELETE)
+                    ..setData(Uri.parse("package:${packageName}"))
+                    ..startActivity()
+
+                    }
+                
+                }
+              ,
+
                 icon: Icon(Icons.delete),
                 shape: RoundedRectangleBorder(),
                 label: Text('UnInstall ${appName}'),
@@ -413,7 +560,11 @@ class __AppDetailState extends State<_AppDetail> {
       name: 'Flutter',
       onMessageReceived: (JavascriptMessage message) {
         String pageBody = message.message;
-        print('page body: $pageBody');
+        if(pageBody.indexOf("We're sorry, the requested URL was not found on this server.") == -1){
+          setState(() => isAppInPlayStore = "available");
+        } else {
+          setState(() => isAppInPlayStore = "not available");
+        }
       },
     );
   }
